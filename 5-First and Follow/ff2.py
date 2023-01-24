@@ -11,19 +11,16 @@ def parse(user_input,start_symbol,parsingTable):
 	#appending dollar to end of input
 	user_input = user_input + "$"
 
-	stack = []
-	
-	stack.append("$")
-	stack.append(start_symbol)
+	stack = ["$", start_symbol]
 
 	input_len = len(user_input)
 	index = 0
 
-	
-	while len(stack) > 0:
+
+	while stack:
 
 		#element at top of stack
-		top = stack[len(stack)-1]
+		top = stack[-1]
 
 		print ("Top =>",top)
 
@@ -34,7 +31,7 @@ def parse(user_input,start_symbol,parsingTable):
 
 		if top == current_input:
 			stack.pop()
-			index = index + 1	
+			index = index + 1
 		else:	
 
 			#finding value for key in table
@@ -47,19 +44,15 @@ def parse(user_input,start_symbol,parsingTable):
 				break
 
 			value = parsingTable[key]
+			#poping top of stack
+			stack.pop()
+
 			if value !='@':
 				value = value[::-1]
 				value = list(value)
-				
-				#poping top of stack
-				stack.pop()
 
 				#push value chars to stack
-				for element in value:
-					stack.append(element)
-			else:
-				stack.pop()		
-
+				stack.extend(iter(value))
 	if flag == 0:
 		print ("String accepted!")
 	else:
@@ -84,10 +77,7 @@ def ll1(follow, productions):
 	for key,val in table.items():
 		print (key,"=>",val)
 
-	new_table = {}
-	for pair in table:
-		new_table[pair[1]] = {}
-
+	new_table = {pair[1]: {} for pair in table}
 	for pair in table:
 		new_table[pair[1]][pair[0]] = table[pair]
 
@@ -109,21 +99,17 @@ def follow(s, productions, ans):
 			if f!=-1:
 				if f==(len(value)-1):
 					if key!=s:
-						if key in ans:
-							temp = ans[key]
-						else:
+						if key not in ans:
 							ans = follow(key, productions, ans)
-							temp = ans[key]
+						temp = ans[key]
 						ans[s] = ans[s].union(temp)
 				else:
 					first_of_next = first(value[f+1:], productions)
 					if '@' in first_of_next:
 						if key!=s:
-							if key in ans:
-								temp = ans[key]
-							else:
+							if key not in ans:
 								ans = follow(key, productions, ans)
-								temp = ans[key]
+							temp = ans[key]
 							ans[s] = ans[s].union(temp)
 							ans[s] = ans[s].union(first_of_next) - {'@'}
 					else:
@@ -135,23 +121,18 @@ def first(s, productions):
 	ans = set()
 	if c.isupper():
 		for st in productions[c]:
-			if st == '@' :				
-				if len(s)!=1 :
-					ans = ans.union( first(s[1:], productions) )
-				else :
-					ans = ans.union('@')
-			else :	
+			if st == '@':	
+				ans = ans.union( first(s[1:], productions) ) if len(s)!=1 else ans.union('@')
+			else:	
 				f = first(st, productions)
-				ans = ans.union(x for x in f)
+				ans = ans.union(iter(f))
 	else:
 		ans = ans.union(c)
 	return ans
 
 if __name__=="__main__":
-	productions=dict()
+	productions = {}
 	grammar = open("grammar2", "r")
-	first_dict = dict()
-	follow_dict = dict()
 	flag = 1
 	start = ""
 	for line in grammar:
@@ -162,19 +143,16 @@ if __name__=="__main__":
 			flag = 0
 			start = lhs
 		productions[lhs] = rhs
-	
-	print ('\nFirst\n')
-	for lhs in productions:
-		first_dict[lhs] = first(lhs, productions)
-	for f in first_dict:
-		print (str(f) + " : " + str(first_dict[f]))
-	print ("")
-	
-	print ('\nFollow\n')
-	
-	for lhs in productions:
-		follow_dict[lhs] = set()
 
+	print ('\nFirst\n')
+	first_dict = {lhs: first(lhs, productions) for lhs in productions}
+	for f, value in first_dict.items():
+		print(f"{str(f)} : {str(value)}")
+	print ("")
+
+	print ('\nFollow\n')
+
+	follow_dict = {lhs: set() for lhs in productions}
 	follow_dict[start] = follow_dict[start].union('$')
 
 	for lhs in productions:
@@ -182,9 +160,9 @@ if __name__=="__main__":
 
 	for lhs in productions:
 		follow_dict = follow(lhs, productions, follow_dict)
-	
+
 	for f in follow_dict:
-		print (str(f) + " : " + str(follow_dict[f]))
+		print(f"{str(f)} : {str(follow_dict[f])}")
 
 	ll1Table = ll1(follow_dict, productions)
 

@@ -14,13 +14,13 @@ def removeDirectLR(gramA, A):
 	for i in temp:
 		if i[0] == A:
 			#tempInCr.append(i[1:])
-			tempInCr.append(i[1:]+[A+"'"])
+			tempInCr.append(i[1:] + [f"{A}'"])
 		else:
 			#tempCr.append(i)
-			tempCr.append(i+[A+"'"])
+			tempCr.append(i + [f"{A}'"])
 	tempInCr.append(["e"])
 	gramA[A] = tempCr
-	gramA[A+"'"] = tempInCr
+	gramA[f"{A}'"] = tempInCr
 	return gramA
 
 
@@ -59,8 +59,8 @@ def rem(gram):
 	gramA = {}
 	revconv = {}
 	for j in gram:
-		conv[j] = "A"+str(c)
-		gramA["A"+str(c)] = []
+		conv[j] = f"A{str(c)}"
+		gramA[f"A{str(c)}"] = []
 		c+=1
 
 	for i in gram:
@@ -76,15 +76,14 @@ def rem(gram):
 
 	#print(gramA)
 	for i in range(c-1,0,-1):
-		ai = "A"+str(i)
-		for j in range(0,i):
+		ai = f"A{str(i)}"
+		for _ in range(i):
 			aj = gramA[ai][0][0]
-			if ai!=aj :
-				if aj in gramA and checkForIndirect(gramA,ai,aj):
-					gramA = rep(gramA, ai)
+			if ai != aj and aj in gramA and checkForIndirect(gramA, ai, aj):
+				gramA = rep(gramA, ai)
 
 	for i in range(1,c):
-		ai = "A"+str(i)
+		ai = f"A{str(i)}"
 		for j in gramA[ai]:
 			if ai==j[0]:
 				gramA = removeDirectLR(gramA, ai)
@@ -128,13 +127,11 @@ def first(gram, term):
 	for i in gram[term]:
 		if i[0] not in gram:
 			a.append(i[0])
-		elif i[0] in gram:
+		else:
 			a += first(gram, i[0])
 	return a
 
-firsts = {}
-for i in result:
-	firsts[i] = first(result,i)
+firsts = {i: first(result,i) for i in result}
 #	print(f'First({i}):',firsts[i])
 
 def follow(gram, term):
@@ -145,10 +142,7 @@ def follow(gram, term):
 				temp = i
 				indx = i.index(term)
 				if indx+1!=len(i):
-					if i[-1] in firsts:
-						a+=firsts[i[-1]]
-					else:
-						a+=[i[-1]]
+					a += firsts[i[-1]] if i[-1] in firsts else [i[-1]]
 				else:
 					a+=["e"]
 				if rule != term and "e" in a:
@@ -167,9 +161,7 @@ resMod = {}
 for i in result:
 	l = []
 	for j in result[i]:
-		temp = ""
-		for k in j:
-			temp+=k
+		temp = "".join(j)
 		l.append(temp)
 	resMod[i] = l
 
@@ -180,14 +172,11 @@ tterm+=["d"]
 pptable = {}
 for i in result:
 	for j in tterm:
-		if j in firsts[i]:
-			pptable[(i,j)]=resMod[i[0]][0]
-		else:
-			pptable[(i,j)]=""
+		pptable[(i,j)] = resMod[i[0]][0] if j in firsts[i] else ""
 	if "e" in firsts[i]:
 		for j in tterm:
 			if j in follows[i]:
-				pptable[(i,j)]="e" 	
+				pptable[(i,j)]="e"
 pptable[("F","i")] = "i"
 toprint = f'{"": <10}'
 for i in tterm:
@@ -197,7 +186,7 @@ for i in result:
 	toprint = f'{i: <10}'
 	for j in tterm:
 		if pptable[(i,j)]!="":
-			toprint+=f'|{i+"->"+pptable[(i,j)]: <10}'
+			toprint += f'|{f"{i}->{pptable[i, j]}": <10}'
 		else:
 			toprint+=f'|{pptable[(i,j)]: <10}'
 	print(f'{"-":-<76}')
