@@ -3,13 +3,13 @@ import pandas as pd
 nfa = {}
 n = int(input("No. of states : "))
 t = int(input("No. of transitions : "))
-for i in range(n):
+for _ in range(n):
     state = input("state name : ")
     nfa[state] = {}
-    for j in range(t):
+    for _ in range(t):
         path = input("path : ")
-        print("Enter end state from state {} travelling through path {} : ".format(state, path))
-        reaching_state = [x for x in input().split()]
+        print(f"Enter end state from state {state} travelling through path {path} : ")
+        reaching_state = list(input().split())
         nfa[state][path] = reaching_state
 
 print("\nNFA :- \n")
@@ -19,18 +19,15 @@ nfa_table = pd.DataFrame(nfa)
 print(nfa_table.transpose())
 
 print("Enter final state of NFA : ")
-nfa_final_state = [x for x in input().split()]
+nfa_final_state = list(input().split())
 
 new_states_list = []
 
-#-------------------------------------------------
-
-dfa = {}
 keys_list = list(
     list(nfa.keys())[0])
 path_list = list(nfa[keys_list[0]].keys())
 
-dfa[keys_list[0]] = {}
+dfa = {keys_list[0]: {}}
 for y in range(t):
     var = "".join(nfa[keys_list[0]][
                       path_list[y]])
@@ -39,19 +36,19 @@ for y in range(t):
         new_states_list.append(var)
         keys_list.append(var)
 
-while len(new_states_list) != 0:
+while new_states_list:
     dfa[new_states_list[0]] = {}
     for _ in range(len(new_states_list[0])):
-        for i in range(len(path_list)):
+        for path_ in path_list:
             temp = []
             for j in range(len(new_states_list[0])):
-                temp += nfa[new_states_list[0][j]][path_list[i]]
+                temp += nfa[new_states_list[0][j]][path_]
             s = ""
             s = s.join(temp)
             if s not in keys_list:
                 new_states_list.append(s)
                 keys_list.append(s)
-            dfa[new_states_list[0]][path_list[i]] = s
+            dfa[new_states_list[0]][path_] = s
 
     new_states_list.remove(new_states_list[0])
 

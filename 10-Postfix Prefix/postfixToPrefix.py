@@ -1,4 +1,4 @@
-OPERATORS = set(['+', '-', '*', '/', '(', ')'])
+OPERATORS = {'+', '-', '*', '/', '(', ')'}
 
 PRI = {'+': 1, '-': 1, '*': 2, '/': 2}
 
@@ -53,7 +53,7 @@ def infix_to_prefix(formula):
 
     for ch in formula:
 
-        if not ch in OPERATORS:
+        if ch not in OPERATORS:
 
             exp_stack.append(ch)
 

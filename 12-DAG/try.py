@@ -1,4 +1,4 @@
-OPERATORS = set(['+', '-', '*', '/', '(', ')'])
+OPERATORS = {'+', '-', '*', '/', '(', ')'}
 PRI = {'+':1, '-':1, '*':2, '/':2}
 
 def infix_to_postfix(formula):
@@ -28,7 +28,7 @@ def infix_to_prefix(formula):
     op_stack = []
     exp_stack = []
     for ch in formula:
-        if not ch in OPERATORS:
+        if ch not in OPERATORS:
             exp_stack.append(ch)
         elif ch == '(':
             op_stack.append(ch)
@@ -46,7 +46,7 @@ def infix_to_prefix(formula):
                 b = exp_stack.pop()
                 exp_stack.append( op+b+a )
             op_stack.append(ch)
-    
+
     # leftover
     while op_stack:
         op = op_stack.pop()
@@ -76,66 +76,66 @@ pre = infix_to_prefix(expres)
 pos = infix_to_postfix(expres)
 generate3AC(pos)
 def Quadruple(pos):
-  stack = []
-  op = []
-  x = 1
-  for i in pos:
-    if i not in OPERATORS:
-       stack.append(i)
-    elif i == '-':
-        op1 = stack.pop()
-        stack.append("t(%s)" %x)
-        print("{0:^4s} | {1:^4s} | {2:^4s}|{3:4s}".format(i,op1,"(-)"," t(%s)" %x))
-        x = x+1
-        if stack != []:
+    stack = []
+    op = []
+    x = 1
+    for i in pos:
+        if i not in OPERATORS:
+            stack.append(i)
+        elif i == '-':
+            op1 = stack.pop()
+            stack.append(f"t({x})")
+            print("{0:^4s} | {1:^4s} | {2:^4s}|{3:4s}".format(i, op1, "(-)", f" t({x})"))
+            x = x+1
+            if stack != []:
+                op2 = stack.pop()
+                op1 = stack.pop()
+                print("{0:^4s} | {1:^4s} | {2:^4s}|{3:4s}".format("+", op1, op2, f" t({x})"))
+                stack.append(f"t({x})")
+                x = x+1
+        elif i == '=':
           op2 = stack.pop()
           op1 = stack.pop()
-          print("{0:^4s} | {1:^4s} | {2:^4s}|{3:4s}".format("+",op1,op2," t(%s)" %x))
-          stack.append("t(%s)" %x)
-          x = x+1
-    elif i == '=':
-      op2 = stack.pop()
-      op1 = stack.pop()
-      print("{0:^4s} | {1:^4s} | {2:^4s}|{3:4s}".format(i,op2,"(-)",op1))
-    else:
-      op1 = stack.pop()
-      op2 = stack.pop()
-      print("{0:^4s} | {1:^4s} | {2:^4s}|{3:4s}".format(i,op2,op1," t(%s)" %x))
-      stack.append("t(%s)" %x)
-      x = x+1
+          print("{0:^4s} | {1:^4s} | {2:^4s}|{3:4s}".format(i,op2,"(-)",op1))
+        else:
+            op1 = stack.pop()
+            op2 = stack.pop()
+            print("{0:^4s} | {1:^4s} | {2:^4s}|{3:4s}".format(i, op2, op1, f" t({x})"))
+            stack.append(f"t({x})")
+            x = x+1
 print("The quadruple for the expression ")
 print(" OP | ARG 1 |ARG 2 |RESULT  ")
 Quadruple(pos)
 
 def Triple(pos):
-        stack = []
-        op = []
-        x = 0
-        for i in pos:
-          if i not in OPERATORS:
+    stack = []
+    op = []
+    x = 0
+    for i in pos:
+        if i not in OPERATORS:
             stack.append(i)
-          elif i == '-':
+        elif i == '-':
             op1 = stack.pop()
-            stack.append("(%s)" %x)
+            stack.append(f"({x})")
             print("{0:^4s} | {1:^4s} | {2:^4s}".format(i,op1,"(-)"))
             x = x+1
             if stack != []:
-              op2 = stack.pop()
-              op1 = stack.pop()
-              print("{0:^4s} | {1:^4s} | {2:^4s}".format("+",op1,op2))
-              stack.append("(%s)" %x)
-              x = x+1
-          elif i == '=':
-            op2 = stack.pop()
-            op1 = stack.pop()
-            print("{0:^4s} | {1:^4s} | {2:^4s}".format(i,op1,op2))
-          else:
+                op2 = stack.pop()
+                op1 = stack.pop()
+                print("{0:^4s} | {1:^4s} | {2:^4s}".format("+",op1,op2))
+                stack.append(f"({x})")
+                x = x+1
+        elif i == '=':
+          op2 = stack.pop()
+          op1 = stack.pop()
+          print("{0:^4s} | {1:^4s} | {2:^4s}".format(i,op1,op2))
+        else:
             op1 = stack.pop()
             if stack != []:           
-              op2 = stack.pop()
-              print("{0:^4s} | {1:^4s} | {2:^4s}".format(i,op2,op1))
-              stack.append("(%s)" %x)
-              x = x+1
+                op2 = stack.pop()
+                print("{0:^4s} | {1:^4s} | {2:^4s}".format(i,op2,op1))
+                stack.append(f"({x})")
+                x = x+1
 print("The triple for given expression")
 print("  OP | ARG 1 |ARG 2  ")
 Triple(pos)
